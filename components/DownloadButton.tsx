@@ -30,7 +30,7 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
         'position:fixed;left:0;top:0;width:1080px;height:1080px;overflow:hidden;pointer-events:none;z-index:9998;';
 
       // 브라우저가 레이아웃을 다시 계산할 때까지 대기
-      await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
       const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(element, {
