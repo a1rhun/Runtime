@@ -28,7 +28,7 @@ export function SpeedLinesDiagonalBg({ filterId, gradientId, maskId }: SpeedLine
 
       <g mask={`url(#${maskId})`} filter={`url(#${filterId})`}>
         {/* Primary diagonal lines */}
-        <g opacity="0.9">
+        <g opacity="0.6">
           <line x1="-30" y1="0"    x2="1110" y2="410"  stroke="#CC0000" strokeWidth="3.5" />
           <line x1="-30" y1="50"   x2="1110" y2="460"  stroke="#880000" strokeWidth="1.5" />
           <line x1="-30" y1="105"  x2="1110" y2="515"  stroke="#FF2222" strokeWidth="2.5" />
@@ -61,7 +61,7 @@ export function SpeedLinesDiagonalBg({ filterId, gradientId, maskId }: SpeedLine
         </g>
 
         {/* Accent lines (bright) */}
-        <g opacity="1">
+        <g opacity="0.4">
           <line x1="-30" y1="30"  x2="1110" y2="440"  stroke="#FF2222" strokeWidth="4.5" />
           <line x1="-30" y1="280" x2="1110" y2="690"  stroke="#FF2222" strokeWidth="3.5" />
           <line x1="-30" y1="580" x2="1110" y2="990"  stroke="#FF3333" strokeWidth="4" />
