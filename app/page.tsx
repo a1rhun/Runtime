@@ -18,13 +18,19 @@ function todayStr() {
   return `${y}.${m}.${d}`;
 }
 
+function infoDateToMatchDate(infoDate: string) {
+  const parts = infoDate.split('.');
+  return parts.length >= 3 ? `${parts[1]} / ${parts[2]}` : infoDate;
+}
+
 // ── 기본값 ──────────────────────────────────────────────
+const _today = todayStr();
 const DEFAULT_ANNOUNCEMENT: MatchAnnouncementData = {
   badge: 'MATCH PREVIEW',
-  infoDate: todayStr(),
+  infoDate: _today,
   infoVenue: '동국대학교 대운동장',
   awayTeam: '3AM',
-  matchDate: '03 / 27',
+  matchDate: infoDateToMatchDate(_today),
   kickoffTime: '18 : 00',
   venueShort: '대운동장',
 };
@@ -206,11 +212,7 @@ export default function Home() {
                 <div style={fieldStyle}>
                   <label style={labelStyle}>INFO DATE</label>
                   <DatePicker value={announcement.infoDate}
-                    onChange={(v) => {
-                      const parts = v.split('.');
-                      const matchDate = parts.length >= 3 ? `${parts[1]} / ${parts[2]}` : v;
-                      setAnnouncement((p) => ({ ...p, infoDate: v, matchDate }));
-                    }} />
+                    onChange={(v) => setAnnouncement((p) => ({ ...p, infoDate: v, matchDate: infoDateToMatchDate(v) }))} />
                 </div>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>INFO VENUE</label>
