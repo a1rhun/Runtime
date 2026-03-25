@@ -141,7 +141,7 @@ const styles = {
   playerNumber: {
     fontFamily: "'Bebas Neue', sans-serif",
     fontSize: '39px',
-    color: 'rgba(180,0,0,0.5)',
+    color: 'rgba(180,0,0,0.9)',
     lineHeight: 1,
     width: '59px',
     flexShrink: 0,
