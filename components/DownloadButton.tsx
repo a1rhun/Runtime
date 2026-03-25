@@ -23,29 +23,21 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
       const element = document.getElementById(targetId);
       if (!element) return;
 
-      // html2canvas는 엘리먼트가 뷰포트 밖(left:-9999px)이면 SVG 크기를 0으로 계산해
-      // "createPattern 0-size canvas" 에러가 남. 캡처 직전 left:0으로 이동.
       const prevCssText = element.style.cssText;
       element.style.cssText =
         'position:fixed;left:0;top:0;width:1080px;height:1080px;overflow:hidden;pointer-events:none;z-index:9998;';
 
-      // 브라우저가 레이아웃을 다시 계산할 때까지 대기
       await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
-      const { default: html2canvas } = await import('html2canvas');
-      const canvas = await html2canvas(element, {
-        scale: 1,
-        useCORS: true,
-        backgroundColor: null,
-        logging: false,
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(element, {
         width: 1080,
         height: 1080,
+        pixelRatio: 1,
       });
 
       // 위치 복원
       element.style.cssText = prevCssText;
-
-      const dataUrl = canvas.toDataURL('image/png');
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       if (isMobile) {

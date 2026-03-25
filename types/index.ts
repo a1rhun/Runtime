@@ -16,6 +16,7 @@ export interface MatchAnnouncementData {
   matchDate: string;
   kickoffTime: string;
   venueShort: string;
+  opponentImage?: string;
 }
 
 export interface StartingXiData {

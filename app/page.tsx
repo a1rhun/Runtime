@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import MatchAnnouncementTemplate from '@/components/templates/MatchAnnouncementTemplate';
-import StartingXiRealTemplate from '@/components/templates/StartingXiRealTemplate';
-import StartingXiTemplate1 from '@/components/templates/StartingXiTemplate1';
+import StartingXiATemplate from '@/components/templates/StartingXiATemplate';
+import StartingXiBTemplate from '@/components/templates/StartingXiBTemplate';
 import DownloadButton from '@/components/DownloadButton';
+import DatePicker from '@/components/DatePicker';
+import PlayerRowInput from '@/components/PlayerRowInput';
 import { MatchAnnouncementData, StartingXiData, Player, SubPlayer } from '@/types';
 
 // ── 오늘 날짜 helper ─────────────────────────────────────
@@ -163,8 +165,8 @@ export default function Home() {
         }}
       >
         {tab === 'announcement' && <MatchAnnouncementTemplate data={announcement} />}
-        {tab === 'xi-real'      && <StartingXiRealTemplate data={xiReal} />}
-        {tab === 'xi-template1' && <StartingXiTemplate1 data={xiT1} />}
+        {tab === 'xi-real'      && <StartingXiATemplate data={xiReal} />}
+        {tab === 'xi-template1' && <StartingXiBTemplate data={xiT1} />}
       </div>
 
       {/* Header */}
@@ -220,8 +222,8 @@ export default function Home() {
                 </div>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>INFO DATE</label>
-                  <input style={inputStyle} value={announcement.infoDate}
-                    onChange={(e) => setAnnouncement((p) => ({ ...p, infoDate: e.target.value }))} />
+                  <DatePicker value={announcement.infoDate}
+                    onChange={(v) => setAnnouncement((p) => ({ ...p, infoDate: v }))} />
                 </div>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>INFO VENUE</label>
@@ -232,6 +234,41 @@ export default function Home() {
                   <label style={labelStyle}>AWAY TEAM</label>
                   <input style={inputStyle} value={announcement.awayTeam}
                     onChange={(e) => setAnnouncement((p) => ({ ...p, awayTeam: e.target.value }))} />
+                </div>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>OPPONENT EMBLEM</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ ...inputStyle, padding: '6px 12px', cursor: 'pointer' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        setAnnouncement((p) => ({ ...p, opponentImage: ev.target?.result as string }));
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                  {announcement.opponentImage && (
+                    <button
+                      style={{
+                        marginTop: '6px',
+                        background: 'transparent',
+                        border: '1px solid rgba(204,0,0,0.4)',
+                        color: 'rgba(255,255,255,0.5)',
+                        fontSize: '12px',
+                        fontFamily: "'Bebas Neue', sans-serif",
+                        letterSpacing: '2px',
+                        padding: '4px 10px',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => setAnnouncement((p) => ({ ...p, opponentImage: undefined }))}
+                    >
+                      REMOVE IMAGE
+                    </button>
+                  )}
                 </div>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>DATE (하단 표시)</label>
@@ -272,8 +309,8 @@ export default function Home() {
                   <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                     <div style={{ flex: 1 }}>
                       <label style={labelStyle}>날짜</label>
-                      <input style={inputStyle} value={data.matchInfoDate}
-                        onChange={(e) => setData((p) => ({ ...p, matchInfoDate: e.target.value }))} />
+                      <DatePicker value={data.matchInfoDate}
+                        onChange={(v) => setData((p) => ({ ...p, matchInfoDate: v }))} />
                     </div>
                     <div style={{ width: '90px', flexShrink: 0 }}>
                       <label style={labelStyle}>시간</label>
@@ -294,59 +331,83 @@ export default function Home() {
                   </div>
 
                   <div style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    fontSize: '14px',
-                    letterSpacing: '3px',
-                    color: 'rgba(255,255,255,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                     margin: '16px 0 8px',
                     borderTop: '1px solid rgba(255,255,255,0.06)',
                     paddingTop: '12px',
                   }}>
-                    PLAYERS (번호 · 이름)
+                    <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '14px', letterSpacing: '3px', color: 'rgba(255,255,255,0.5)' }}>
+                      PLAYERS (번호 · 이름)
+                    </span>
+                    <button
+                      onClick={() => setData((p) => ({ ...p, players: p.players.map(() => ({ num: '', name: '' })) }))}
+                      style={{ background: 'transparent', border: '1px solid rgba(204,0,0,0.3)', color: 'rgba(204,0,0,0.6)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', cursor: 'pointer', borderRadius: '2px' }}
+                    >
+                      CLEAR ALL
+                    </button>
                   </div>
 
                   {data.players.map((player, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '6px' }}>
-                      <input
-                        style={{ ...inputStyle, width: '52px', flexShrink: 0, textAlign: 'center' }}
-                        value={player.num}
-                        placeholder="#"
-                        onChange={(e) => updatePlayer(setData, i, 'num', e.target.value)}
-                      />
-                      <input
-                        style={{ ...inputStyle, flex: 1 }}
-                        value={player.name}
-                        placeholder="이름"
-                        onChange={(e) => updatePlayer(setData, i, 'name', e.target.value)}
+                    <div key={i} style={{ marginBottom: '6px' }}>
+                      <PlayerRowInput
+                        num={player.num}
+                        name={player.name}
+                        inputStyle={inputStyle}
+                        onNumChange={(v) => updatePlayer(setData, i, 'num', v)}
+                        onNameChange={(v) => updatePlayer(setData, i, 'name', v)}
+                        onSelect={(p) => setData((prev) => {
+                          const players = [...prev.players];
+                          players[i] = { num: p.num, name: p.name };
+                          return { ...prev, players };
+                        })}
+                        onClear={() => setData((prev) => {
+                          const players = [...prev.players];
+                          players[i] = { num: '', name: '' };
+                          return { ...prev, players };
+                        })}
                       />
                     </div>
                   ))}
 
                   <div style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    fontSize: '14px',
-                    letterSpacing: '3px',
-                    color: 'rgba(255,255,255,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                     margin: '16px 0 8px',
                     borderTop: '1px solid rgba(255,255,255,0.06)',
                     paddingTop: '12px',
                   }}>
-                    SUBSTITUTIONS (번호 · 이름)
+                    <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '14px', letterSpacing: '3px', color: 'rgba(255,255,255,0.5)' }}>
+                      SUBSTITUTIONS (번호 · 이름)
+                    </span>
+                    <button
+                      onClick={() => setData((p) => ({ ...p, substitutes: p.substitutes.map(() => ({ num: '', name: '' })) }))}
+                      style={{ background: 'transparent', border: '1px solid rgba(204,0,0,0.3)', color: 'rgba(204,0,0,0.6)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', cursor: 'pointer', borderRadius: '2px' }}
+                    >
+                      CLEAR ALL
+                    </button>
                   </div>
 
                   {data.substitutes.map((sub, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '6px' }}>
-                      <input
-                        style={{ ...inputStyle, width: '52px', flexShrink: 0, textAlign: 'center' }}
-                        value={sub.num}
-                        placeholder="#"
-                        onChange={(e) => updateSub(setData, i, 'num', e.target.value)}
-                      />
-                      <input
-                        style={{ ...inputStyle, flex: 1 }}
-                        value={sub.name}
-                        placeholder="이름"
-                        onChange={(e) => updateSub(setData, i, 'name', e.target.value)}
+                    <div key={i} style={{ marginBottom: '6px' }}>
+                      <PlayerRowInput
+                        num={sub.num}
+                        name={sub.name}
+                        inputStyle={inputStyle}
+                        onNumChange={(v) => updateSub(setData, i, 'num', v)}
+                        onNameChange={(v) => updateSub(setData, i, 'name', v)}
+                        onSelect={(p) => setData((prev) => {
+                          const substitutes = [...prev.substitutes];
+                          substitutes[i] = { num: p.num, name: p.name };
+                          return { ...prev, substitutes };
+                        })}
+                        onClear={() => setData((prev) => {
+                          const substitutes = [...prev.substitutes];
+                          substitutes[i] = { num: '', name: '' };
+                          return { ...prev, substitutes };
+                        })}
                       />
                     </div>
                   ))}
@@ -391,8 +452,8 @@ export default function Home() {
             >
               {/* 미리보기용 (스케일 적용) */}
               {tab === 'announcement' && <MatchAnnouncementTemplate data={announcement} />}
-              {tab === 'xi-real'      && <StartingXiRealTemplate data={xiReal} />}
-              {tab === 'xi-template1' && <StartingXiTemplate1 data={xiT1} />}
+              {tab === 'xi-real'      && <StartingXiATemplate data={xiReal} />}
+              {tab === 'xi-template1' && <StartingXiBTemplate data={xiT1} />}
             </div>
           </div>
 
