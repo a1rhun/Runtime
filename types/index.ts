@@ -10,6 +10,7 @@ export interface SubPlayer {
 
 export interface MatchAnnouncementData {
   badge: string;
+  competition: string;
   infoDate: string;
   infoVenue: string;
   awayTeam: string;
