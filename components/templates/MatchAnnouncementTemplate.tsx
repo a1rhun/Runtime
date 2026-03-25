@@ -152,6 +152,7 @@ const styles = {
     letterSpacing: '1px',
     color: '#fff',
     lineHeight: 1,
+    whiteSpace: 'nowrap' as const,
   },
   timeBlockDivider: {
     width: '1px',
