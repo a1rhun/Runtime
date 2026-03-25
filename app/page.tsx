@@ -22,19 +22,21 @@ function todayStr() {
   return `${y}.${m}.${d}`;
 }
 
-function infoDateToMatchDate(infoDate: string) {
-  const parts = infoDate.split('.');
-  return parts.length >= 3 ? `${parts[1]} / ${parts[2]}` : infoDate;
+function dateToMatchDate(yyyymmdd: string): string {
+  const parts = yyyymmdd.split('.');
+  if (parts.length !== 3) return yyyymmdd;
+  return `${parts[1]} / ${parts[2]}`;
 }
 
 // ── 기본값 ──────────────────────────────────────────────
 const _today = todayStr();
 const DEFAULT_ANNOUNCEMENT: MatchAnnouncementData = {
   badge: 'MATCH PREVIEW',
-  infoDate: _today,
+  competition: '토토배 8강',
+  infoDate: todayStr(),
   infoVenue: '동국대학교 대운동장',
   awayTeam: '3AM',
-  matchDate: infoDateToMatchDate(_today),
+  matchDate: dateToMatchDate(todayStr()),
   kickoffTime: '18 : 00',
   venueShort: '대운동장',
 };
@@ -68,9 +70,9 @@ const DEFAULT_RESULT_OFFICIAL: MatchResultOfficialData = {
 };
 
 const DEFAULT_POM: PlayerOfMatchData = {
-  pomName: '공가훈',
-  pomNumber: '10',
-  pomPosition: 'MF',
+  pomName: '',
+  pomNumber: '7',
+  pomPosition: '',
   matchLabel: '토토배 · 2026',
 };
 
@@ -262,22 +264,23 @@ export default function Home() {
             {tab === 'announcement' && (
               <>
                 <div style={fieldStyle}>
-                  <label style={labelStyle}>BADGE TEXT</label>
-                  <input style={inputStyle} value={announcement.badge}
-                    onChange={(e) => setAnnouncement((p) => ({ ...p, badge: e.target.value }))} />
+                  <label style={labelStyle}>대회</label>
+                  <input style={inputStyle} value={announcement.competition}
+                    placeholder="토토배 8강"
+                    onChange={(e) => setAnnouncement((p) => ({ ...p, competition: e.target.value }))} />
                 </div>
                 <div style={fieldStyle}>
-                  <label style={labelStyle}>INFO DATE</label>
+                  <label style={labelStyle}>날짜</label>
                   <DatePicker value={announcement.infoDate}
-                    onChange={(v) => setAnnouncement((p) => ({ ...p, infoDate: v, matchDate: infoDateToMatchDate(v) }))} />
+                    onChange={(v) => setAnnouncement((p) => ({ ...p, infoDate: v, matchDate: dateToMatchDate(v) }))} />
                 </div>
                 <div style={fieldStyle}>
-                  <label style={labelStyle}>INFO VENUE</label>
+                  <label style={labelStyle}>장소</label>
                   <input style={inputStyle} value={announcement.infoVenue}
                     onChange={(e) => setAnnouncement((p) => ({ ...p, infoVenue: e.target.value }))} />
                 </div>
                 <div style={fieldStyle}>
-                  <label style={labelStyle}>AWAY TEAM</label>
+                  <label style={labelStyle}>상대팀</label>
                   <input style={inputStyle} value={announcement.awayTeam}
                     onChange={(e) => setAnnouncement((p) => ({ ...p, awayTeam: e.target.value }))} />
                 </div>
@@ -317,17 +320,12 @@ export default function Home() {
                   )}
                 </div>
                 <div style={fieldStyle}>
-                  <label style={labelStyle}>DATE (하단 표시)</label>
-                  <input style={inputStyle} value={announcement.matchDate}
-                    onChange={(e) => setAnnouncement((p) => ({ ...p, matchDate: e.target.value }))} />
-                </div>
-                <div style={fieldStyle}>
-                  <label style={labelStyle}>KICKOFF TIME</label>
+                  <label style={labelStyle}>시간</label>
                   <input style={inputStyle} value={announcement.kickoffTime}
                     onChange={(e) => setAnnouncement((p) => ({ ...p, kickoffTime: e.target.value }))} />
                 </div>
                 <div style={fieldStyle}>
-                  <label style={labelStyle}>VENUE SHORT</label>
+                  <label style={labelStyle}>장소 (짧게)</label>
                   <input style={inputStyle} value={announcement.venueShort}
                     onChange={(e) => setAnnouncement((p) => ({ ...p, venueShort: e.target.value }))} />
                 </div>
