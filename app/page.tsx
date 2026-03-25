@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import MatchAnnouncementTemplate from '@/components/templates/MatchAnnouncementTemplate';
 import StartingXiATemplate from '@/components/templates/StartingXiATemplate';
 import StartingXiBTemplate from '@/components/templates/StartingXiBTemplate';
@@ -29,29 +29,6 @@ const DEFAULT_ANNOUNCEMENT: MatchAnnouncementData = {
   venueShort: '대운동장',
 };
 
-const DEFAULT_PLAYERS: Player[] = [
-  { num: '21', name: '장한승' },
-  { num: '3',  name: '이시우'  },
-  { num: '5',  name: '손승현'  },
-  { num: '4',  name: '정유현'  },
-  { num: '2',  name: '이준후'  },
-  { num: '6',  name: '정서현'  },
-  { num: '8',  name: '김준승'  },
-  { num: '10', name: '오현석'  },
-  { num: '11', name: '박태준'  },
-  { num: '9',  name: '성준서'  },
-  { num: '7',  name: '김영민'  },
-];
-
-const DEFAULT_SUBS: SubPlayer[] = [
-  { num: '12', name: '김민준' },
-  { num: '13', name: '이도현' },
-  { num: '14', name: '박지호' },
-  { num: '15', name: '최우성' },
-  { num: '16', name: '강현우' },
-  { num: '17', name: '윤서준' },
-  { num: '18', name: '임태양' },
-];
 
 const DEFAULT_XI: StartingXiData = {
   matchLabel: '★ 토토배 · 2026',
@@ -60,8 +37,8 @@ const DEFAULT_XI: StartingXiData = {
   matchInfoTime: '18:00',
   matchInfoVenue: '동국대학교 대운동장',
   formation: '4 - 2 - 1 - 3',
-  players: DEFAULT_PLAYERS,
-  substitutes: DEFAULT_SUBS,
+  players: Array(11).fill(null).map(() => ({ num: '', name: '' })),
+  substitutes: Array(7).fill(null).map(() => ({ num: '', name: '' })),
 };
 
 type Tab = 'announcement' | 'xi-real' | 'xi-template1';
@@ -112,6 +89,12 @@ export default function Home() {
   const [announcement, setAnnouncement] = useState<MatchAnnouncementData>(DEFAULT_ANNOUNCEMENT);
   const [xiReal, setXiReal] = useState<StartingXiData>(DEFAULT_XI);
   const [xiT1, setXiT1] = useState<StartingXiData>(DEFAULT_XI);
+
+  // 번호 입력 탭 네비게이션용 refs
+  const xiRealPlayerRefs = useRef<(HTMLInputElement | null)[]>(Array(11).fill(null));
+  const xiRealSubRefs = useRef<(HTMLInputElement | null)[]>(Array(7).fill(null));
+  const xiT1PlayerRefs = useRef<(HTMLInputElement | null)[]>(Array(11).fill(null));
+  const xiT1SubRefs = useRef<(HTMLInputElement | null)[]>(Array(7).fill(null));
 
   // 플레이어 행 업데이트 헬퍼
   const updatePlayer = (
@@ -223,7 +206,11 @@ export default function Home() {
                 <div style={fieldStyle}>
                   <label style={labelStyle}>INFO DATE</label>
                   <DatePicker value={announcement.infoDate}
-                    onChange={(v) => setAnnouncement((p) => ({ ...p, infoDate: v }))} />
+                    onChange={(v) => {
+                      const parts = v.split('.');
+                      const matchDate = parts.length >= 3 ? `${parts[1]} / ${parts[2]}` : v;
+                      setAnnouncement((p) => ({ ...p, infoDate: v, matchDate }));
+                    }} />
                 </div>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>INFO VENUE</label>
@@ -292,6 +279,8 @@ export default function Home() {
             {(tab === 'xi-real' || tab === 'xi-template1') && (() => {
               const data = tab === 'xi-real' ? xiReal : xiT1;
               const setData = tab === 'xi-real' ? setXiReal : setXiT1;
+              const playerRefs = tab === 'xi-real' ? xiRealPlayerRefs : xiT1PlayerRefs;
+              const subRefs = tab === 'xi-real' ? xiRealSubRefs : xiT1SubRefs;
               return (
                 <>
                   <div style={fieldStyle}>
@@ -360,6 +349,7 @@ export default function Home() {
                   {data.players.map((player, i) => (
                     <div key={i} style={{ marginBottom: '6px' }}>
                       <PlayerRowInput
+                        ref={(el) => { playerRefs.current[i] = el; }}
                         num={player.num}
                         name={player.name}
                         inputStyle={inputStyle}
@@ -375,6 +365,10 @@ export default function Home() {
                           players[i] = { num: '', name: '' };
                           return { ...prev, players };
                         })}
+                        onTabNext={() => {
+                          if (i < data.players.length - 1) playerRefs.current[i + 1]?.focus();
+                          else subRefs.current[0]?.focus();
+                        }}
                       />
                     </div>
                   ))}
@@ -409,6 +403,7 @@ export default function Home() {
                   {data.substitutes.map((sub, i) => (
                     <div key={i} style={{ marginBottom: '6px' }}>
                       <PlayerRowInput
+                        ref={(el) => { subRefs.current[i] = el; }}
                         num={sub.num}
                         name={sub.name}
                         inputStyle={inputStyle}
@@ -424,6 +419,7 @@ export default function Home() {
                           substitutes[i] = { num: '', name: '' };
                           return { ...prev, substitutes };
                         })}
+                        onTabNext={() => subRefs.current[i + 1]?.focus()}
                       />
                     </div>
                   ))}
