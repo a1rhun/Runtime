@@ -10,6 +10,7 @@ export const PLAYER_DB: PlayerProfile[] = [
   { num: '2',  name: '심민서' },
   { num: '3',  name: '김준승' },
   { num: '5',  name: '정서현' },
+  { num: '6',  name: '정유현' },
   { num: '7',  name: '공기훈' },
   { num: '8',  name: '성준서' },
   { num: '9',  name: '박태준' },
