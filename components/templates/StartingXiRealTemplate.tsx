@@ -1,4 +1,4 @@
-import { StartingXiData } from '@/types';
+import { StartingXiData, SubPlayer } from '@/types';
 import RuntimeLogo from './RuntimeLogo';
 
 interface Props {
@@ -6,10 +6,11 @@ interface Props {
 }
 
 export default function StartingXiRealTemplate({ data }: Props) {
-  const subsArray = data.substitutes
-    .split(/[\n,]/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  // 교체선수 4명씩 줄 나눔
+  const subRows: SubPlayer[][] = [];
+  for (let i = 0; i < data.substitutes.length; i += 4) {
+    subRows.push(data.substitutes.slice(i, i + 4));
+  }
 
   return (
     <div style={{
@@ -263,12 +264,16 @@ export default function StartingXiRealTemplate({ data }: Props) {
                   letterSpacing: '2px',
                   lineHeight: 2,
                 }}>
-                  {subsArray.reduce<React.ReactNode[]>((acc, name, i) => {
-                    if (i > 0 && i % 4 === 0) acc.push(<br key={`br-${i}`} />);
-                    if (i % 4 !== 0) acc.push(<span key={`sp-${i}`}>&nbsp;&nbsp;</span>);
-                    acc.push(<span key={name + i}>{name}</span>);
-                    return acc;
-                  }, [])}
+                  {subRows.map((row, ri) => (
+                    <div key={ri} style={{ display: 'flex', gap: '24px' }}>
+                      {row.map((sub, si) => (
+                        <span key={si}>
+                          <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#CC0000', marginRight: '6px' }}>{sub.num}</span>
+                          {sub.name}
+                        </span>
+                      ))}
+                    </div>
+                  ))}
                 </div>
               </div>
 

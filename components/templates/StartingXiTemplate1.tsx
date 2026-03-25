@@ -11,7 +11,11 @@ const S = 1080;
 const s = (ratio: number) => `${S * ratio}px`;
 
 export default function StartingXiTemplate1({ data }: Props) {
-  const subsText = data.substitutes.trim() || '교체 선수를 여기에 입력하세요';
+  const matchDateStr = `${data.matchInfoDate} · ${data.matchInfoTime} · ${data.matchInfoVenue}`;
+  const subRows = [];
+  for (let i = 0; i < data.substitutes.length; i += 4) {
+    subRows.push(data.substitutes.slice(i, i + 4));
+  }
 
   return (
     <div style={{
@@ -188,7 +192,7 @@ export default function StartingXiTemplate1({ data }: Props) {
               fontWeight: 400,
               marginTop: s(0.006),
             }}>
-              {data.matchDate}
+              {matchDateStr}
             </div>
           </div>
           <RuntimeLogo
@@ -273,15 +277,6 @@ export default function StartingXiTemplate1({ data }: Props) {
               }}>
                 {player.name}
               </div>
-              <div style={{
-                fontFamily: "'Bebas Neue', sans-serif",
-                fontSize: s(0.012),
-                color: 'rgba(255,255,255,0.2)',
-                letterSpacing: '0.18em',
-                alignSelf: 'center',
-              }}>
-                {player.pos}
-              </div>
             </div>
           ))}
         </div>
@@ -310,7 +305,16 @@ export default function StartingXiTemplate1({ data }: Props) {
             letterSpacing: '0.04em',
             lineHeight: 1.7,
           }}>
-            {subsText}
+            {subRows.map((row, ri) => (
+              <div key={ri} style={{ display: 'flex', gap: `${s(0.02)}` }}>
+                {row.map((sub, si) => (
+                  <span key={si}>
+                    <span style={{ fontFamily: "'Bebas Neue', sans-serif", color: '#CC0000', marginRight: `${s(0.004)}` }}>{sub.num}</span>
+                    {sub.name}
+                  </span>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
 
