@@ -49,18 +49,13 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
             await navigator.share({ files: [file] });
             return;
           } catch {
-            // 공유 취소 or 미지원 → 새 탭 fallback
+            // 공유 취소 or 미지원 → 다운로드 fallback
           }
         }
-        const newTab = window.open('', '_blank');
-        if (newTab) {
-          newTab.document.write(
-            `<html><body style="margin:0;background:#000">` +
-            `<img src="${dataUrl}" style="width:100%;display:block">` +
-            `</body></html>`
-          );
-          newTab.document.close();
-        }
+        const link = document.createElement('a');
+        link.download = `${filename}.png`;
+        link.href = dataUrl;
+        link.click();
       } else {
         const link = document.createElement('a');
         link.download = `${filename}.png`;
