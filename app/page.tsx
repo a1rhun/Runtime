@@ -341,12 +341,20 @@ export default function Home() {
                     <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '14px', letterSpacing: '3px', color: 'rgba(255,255,255,0.5)' }}>
                       PLAYERS (번호 · 이름)
                     </span>
-                    <button
-                      onClick={() => setData((p) => ({ ...p, players: p.players.map(() => ({ num: '', name: '' })) }))}
-                      style={{ background: 'transparent', border: '1px solid rgba(204,0,0,0.3)', color: 'rgba(204,0,0,0.6)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', cursor: 'pointer', borderRadius: '2px' }}
-                    >
-                      CLEAR ALL
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button
+                        onClick={() => setData((p) => ({ ...p, players: [...p.players].sort((a, b) => Number(a.num || 9999) - Number(b.num || 9999)) }))}
+                        style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.4)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', cursor: 'pointer', borderRadius: '2px' }}
+                      >
+                        SORT
+                      </button>
+                      <button
+                        onClick={() => setData((p) => ({ ...p, players: p.players.map(() => ({ num: '', name: '' })) }))}
+                        style={{ background: 'transparent', border: '1px solid rgba(204,0,0,0.3)', color: 'rgba(204,0,0,0.6)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', cursor: 'pointer', borderRadius: '2px' }}
+                      >
+                        CLEAR ALL
+                      </button>
+                    </div>
                   </div>
 
                   {data.players.map((player, i) => (
@@ -382,12 +390,20 @@ export default function Home() {
                     <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '14px', letterSpacing: '3px', color: 'rgba(255,255,255,0.5)' }}>
                       SUBSTITUTIONS (번호 · 이름)
                     </span>
-                    <button
-                      onClick={() => setData((p) => ({ ...p, substitutes: p.substitutes.map(() => ({ num: '', name: '' })) }))}
-                      style={{ background: 'transparent', border: '1px solid rgba(204,0,0,0.3)', color: 'rgba(204,0,0,0.6)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', cursor: 'pointer', borderRadius: '2px' }}
-                    >
-                      CLEAR ALL
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button
+                        onClick={() => setData((p) => ({ ...p, substitutes: [...p.substitutes].sort((a, b) => Number(a.num || 9999) - Number(b.num || 9999)) }))}
+                        style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.4)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', cursor: 'pointer', borderRadius: '2px' }}
+                      >
+                        SORT
+                      </button>
+                      <button
+                        onClick={() => setData((p) => ({ ...p, substitutes: p.substitutes.map(() => ({ num: '', name: '' })) }))}
+                        style={{ background: 'transparent', border: '1px solid rgba(204,0,0,0.3)', color: 'rgba(204,0,0,0.6)', fontFamily: "'Bebas Neue', sans-serif", fontSize: '11px', letterSpacing: '2px', padding: '3px 8px', cursor: 'pointer', borderRadius: '2px' }}
+                      >
+                        CLEAR ALL
+                      </button>
+                    </div>
                   </div>
 
                   {data.substitutes.map((sub, i) => (

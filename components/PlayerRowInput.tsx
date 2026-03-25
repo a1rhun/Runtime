@@ -15,6 +15,7 @@ interface Props {
 
 export default function PlayerRowInput({ num, name, onNumChange, onNameChange, onSelect, onClear, inputStyle }: Props) {
   const [suggestions, setSuggestions] = useState<PlayerProfile[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,6 +29,8 @@ export default function PlayerRowInput({ num, name, onNumChange, onNameChange, o
 
   const handleNumChange = (val: string) => {
     onNumChange(val);
+    setActiveIndex(-1);
+    if (!val) { onNameChange(''); setSuggestions([]); return; }
     const exact = findByNum(val);
     if (exact) { onNameChange(exact.name); setSuggestions([]); return; }
     setSuggestions(searchByNum(val));
@@ -35,6 +38,7 @@ export default function PlayerRowInput({ num, name, onNumChange, onNameChange, o
 
   const handleNameChange = (val: string) => {
     onNameChange(val);
+    setActiveIndex(-1);
     const exact = findByName(val);
     if (exact) { onNumChange(exact.num); setSuggestions([]); return; }
     setSuggestions(searchByName(val));
@@ -43,6 +47,24 @@ export default function PlayerRowInput({ num, name, onNumChange, onNameChange, o
   const handleSelect = (profile: PlayerProfile) => {
     onSelect(profile);
     setSuggestions([]);
+    setActiveIndex(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (suggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIndex >= 0) handleSelect(suggestions[activeIndex]);
+    } else if (e.key === 'Escape') {
+      setSuggestions([]);
+      setActiveIndex(-1);
+    }
   };
 
   return (
@@ -54,6 +76,7 @@ export default function PlayerRowInput({ num, name, onNumChange, onNameChange, o
           placeholder="#"
           onChange={(e) => handleNumChange(e.target.value)}
           onFocus={() => { if (num) setSuggestions(searchByNum(num)); }}
+          onKeyDown={handleKeyDown}
         />
         <input
           style={{ ...inputStyle, flex: 1 }}
@@ -61,6 +84,7 @@ export default function PlayerRowInput({ num, name, onNumChange, onNameChange, o
           placeholder="이름"
           onChange={(e) => handleNameChange(e.target.value)}
           onFocus={() => { if (name) setSuggestions(searchByName(name)); }}
+          onKeyDown={handleKeyDown}
         />
         <button
           onClick={onClear}
@@ -97,25 +121,25 @@ export default function PlayerRowInput({ num, name, onNumChange, onNameChange, o
           overflow: 'hidden',
           boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
         }}>
-          {suggestions.map((p) => (
+          {suggestions.map((p, i) => (
             <button
               key={p.num}
               onMouseDown={(e) => { e.preventDefault(); handleSelect(p); }}
+              onMouseEnter={() => setActiveIndex(i)}
+              onMouseLeave={() => setActiveIndex(-1)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
                 width: '100%',
                 padding: '8px 12px',
-                background: 'transparent',
+                background: i === activeIndex ? 'rgba(204,0,0,0.2)' : 'transparent',
                 border: 'none',
                 borderBottom: '1px solid rgba(255,255,255,0.04)',
                 cursor: 'pointer',
                 textAlign: 'left',
                 color: '#fff',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(204,0,0,0.12)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '16px', color: '#CC0000', width: '28px', flexShrink: 0 }}>
                 {p.num}
