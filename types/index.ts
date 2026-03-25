@@ -1,7 +1,11 @@
 export interface Player {
   num: string;
   name: string;
-  pos: string;
+}
+
+export interface SubPlayer {
+  num: string;
+  name: string;
 }
 
 export interface MatchAnnouncementData {
@@ -17,8 +21,10 @@ export interface MatchAnnouncementData {
 export interface StartingXiData {
   matchLabel: string;
   matchVs: string;
-  matchDate: string;
+  matchInfoDate: string;
+  matchInfoTime: string;
+  matchInfoVenue: string;
   formation: string;
   players: Player[];
-  substitutes: string;
+  substitutes: SubPlayer[];
 }
