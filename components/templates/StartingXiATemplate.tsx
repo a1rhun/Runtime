@@ -129,13 +129,13 @@ const styles = {
     display: 'flex',
     flexDirection: 'column' as const,
     flex: 1,
-    justifyContent: 'space-evenly' as const,
+    justifyContent: 'center' as const,
+    gap: '16px',
   },
   playerRow: {
     display: 'flex',
     alignItems: 'baseline' as const,
     gap: '13px',
-    padding: '5px 0',
     borderBottom: '1px solid rgba(255,255,255,0.055)',
   },
   playerNumber: {
@@ -149,12 +149,12 @@ const styles = {
   },
   playerName: {
     fontFamily: "'Bebas Neue', sans-serif",
-    fontSize: '32px',
-    fontWeight: 750,
+    fontSize: '36px',
+    fontWeight: 700,
     color: '#fff',
-    letterSpacing: '0.28em',
+    letterSpacing: '0.42em',
     lineHeight: 1,
-    flex: 1,
+    flex: 1,  
   },
 
   // --- Substitutions ---
