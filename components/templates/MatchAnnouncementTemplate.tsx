@@ -148,7 +148,7 @@ const styles = {
   timeBlockVenueValue: {
     fontSize: '40px',
     fontFamily: "'Bebas Neue', sans-serif",
-    fontWeight: 700,
+    fontWeight: 600,
     letterSpacing: '1px',
     color: '#fff',
     lineHeight: 1,
