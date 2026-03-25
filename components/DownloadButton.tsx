@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 interface Props {
   targetId: string;
@@ -12,23 +12,71 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
 
   const handleDownload = async () => {
     setLoading(true);
+
+    // 캡처 중 카드가 화면에 잠깐 보이는 것을 막는 오버레이
+    const overlay = document.createElement('div');
+    overlay.style.cssText =
+      'position:fixed;inset:0;background:#0a0a0a;z-index:9999;pointer-events:none;';
+    document.body.appendChild(overlay);
+
     try {
-      const { default: html2canvas } = await import('html2canvas');
       const element = document.getElementById(targetId);
       if (!element) return;
 
+      // html2canvas는 엘리먼트가 뷰포트 밖(left:-9999px)이면 SVG 크기를 0으로 계산해
+      // "createPattern 0-size canvas" 에러가 남. 캡처 직전 left:0으로 이동.
+      const prevCssText = element.style.cssText;
+      element.style.cssText =
+        'position:fixed;left:0;top:0;width:1080px;height:1080px;overflow:hidden;pointer-events:none;z-index:9998;';
+
+      // 브라우저가 레이아웃을 다시 계산할 때까지 대기
+      await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(element, {
         scale: 1,
         useCORS: true,
         backgroundColor: null,
         logging: false,
+        width: 1080,
+        height: 1080,
       });
 
-      const link = document.createElement('a');
-      link.download = `${filename}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      // 위치 복원
+      element.style.cssText = prevCssText;
+
+      const dataUrl = canvas.toDataURL('image/png');
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        if (navigator.share) {
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          const file = new File([blob], `${filename}.png`, { type: 'image/png' });
+          try {
+            await navigator.share({ files: [file] });
+            return;
+          } catch {
+            // 공유 취소 or 미지원 → 새 탭 fallback
+          }
+        }
+        const newTab = window.open('', '_blank');
+        if (newTab) {
+          newTab.document.write(
+            `<html><body style="margin:0;background:#000">` +
+            `<img src="${dataUrl}" style="width:100%;display:block">` +
+            `</body></html>`
+          );
+          newTab.document.close();
+        }
+      } else {
+        const link = document.createElement('a');
+        link.download = `${filename}.png`;
+        link.href = dataUrl;
+        link.click();
+      }
     } finally {
+      overlay.remove();
       setLoading(false);
     }
   };

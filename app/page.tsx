@@ -147,7 +147,25 @@ export default function Home() {
       : `runtime-starting-xi-alt`;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#fff' }}>
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#fff', position: 'relative' }}>
+
+      {/* 캡처 전용 렌더 — 화면 밖이지만 transform 없는 독립 위치 */}
+      <div
+        id="card-preview"
+        style={{
+          position: 'fixed',
+          left: '-9999px',
+          top: '0',
+          width: '1080px',
+          height: '1080px',
+          overflow: 'hidden',
+          pointerEvents: 'none',
+        }}
+      >
+        {tab === 'announcement' && <MatchAnnouncementTemplate data={announcement} />}
+        {tab === 'xi-real'      && <StartingXiRealTemplate data={xiReal} />}
+        {tab === 'xi-template1' && <StartingXiTemplate1 data={xiT1} />}
+      </div>
 
       {/* Header */}
       <header className="page-header">
@@ -371,13 +389,7 @@ export default function Home() {
                 height: `${CARD_SIZE}px`,
               }}
             >
-              {/* 실제 캡처 대상 (1080×1080, 숨겨진 위치에 실물 크기로 렌더) */}
-              <div id="card-preview" style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-                {tab === 'announcement' && <MatchAnnouncementTemplate data={announcement} />}
-                {tab === 'xi-real'      && <StartingXiRealTemplate data={xiReal} />}
-                {tab === 'xi-template1' && <StartingXiTemplate1 data={xiT1} />}
-              </div>
-              {/* 미리보기용 복사본 (스케일) */}
+              {/* 미리보기용 (스케일 적용) */}
               {tab === 'announcement' && <MatchAnnouncementTemplate data={announcement} />}
               {tab === 'xi-real'      && <StartingXiRealTemplate data={xiReal} />}
               {tab === 'xi-template1' && <StartingXiTemplate1 data={xiT1} />}
