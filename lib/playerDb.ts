@@ -41,6 +41,7 @@ export const PLAYER_DB: PlayerProfile[] = [
   { num: '42', name: '김현모' },
   { num: '47', name: '이현우' },
   { num: '66', name: '안시우' },
+  { num: '69', name: '개' },
   { num: '77', name: '오현석' },
   { num: '99', name: '장한승' },
 ];
