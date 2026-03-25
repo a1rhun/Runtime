@@ -117,6 +117,7 @@ const PlayerRowInput = forwardRef<HTMLInputElement, Props>(
             style={{ ...inputStyle, flex: 1 }}
             value={name}
             placeholder="이름"
+            tabIndex={-1}
             onChange={(e) => handleNameChange(e.target.value)}
             onFocus={() => { if (name) setSuggestions(searchByName(name)); }}
             onKeyDown={handleNameKeyDown}
@@ -124,6 +125,7 @@ const PlayerRowInput = forwardRef<HTMLInputElement, Props>(
           <button
             onClick={onClear}
             title="초기화"
+            tabIndex={-1}
             style={{
               flexShrink: 0,
               background: 'transparent',
