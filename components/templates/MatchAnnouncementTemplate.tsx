@@ -33,7 +33,7 @@ const styles = {
     flexDirection: "column" as const,
     alignItems: "center",
     gap: "14px",
-    marginBottom: "120px",
+    marginBottom: "60px",
     width: "100%",
   },
   competitionText: {
@@ -41,14 +41,15 @@ const styles = {
     fontSize: "36px",
     letterSpacing: "10px",
     color: "#fff",
-    lineHeight: 1,
+    lineHeight: 1.3,
   },
   competitionSub: {
     fontFamily: "'Noto Sans KR', sans-serif",
     fontSize: "36px",
     fontWeight: 600,
     letterSpacing: "6px",
-    lineHeight: 1,
+    lineHeight: 1.3,
+    paddingBottom: "4px",
     marginTop: "2px",
     background:
       "linear-gradient(90deg, #CC0000, rgba(255,220,200,0.9), #CC0000)",
