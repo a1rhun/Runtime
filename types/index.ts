@@ -35,6 +35,7 @@ export interface Scorer {
   minute: string;
   name: string;
   assist?: string;
+  isPenalty?: boolean;
 }
 
 export interface MatchResultOfficialData {

@@ -11,6 +11,7 @@ import PlayerOfMatchV2Template from '@/components/templates/PlayerOfMatchV2Templ
 import DownloadButton from '@/components/DownloadButton';
 import DatePicker from '@/components/DatePicker';
 import PlayerRowInput from '@/components/PlayerRowInput';
+import { PLAYER_DB } from '@/lib/playerDb';
 import { MatchAnnouncementData, StartingXiData, Player, SubPlayer, MatchResultOfficialData, MatchResultFriendlyData, PlayerOfMatchData } from '@/types';
 
 // ── 오늘 날짜 helper ─────────────────────────────────────
@@ -57,15 +58,15 @@ const DEFAULT_RESULT_OFFICIAL: MatchResultOfficialData = {
   badge: '토토배',
   infoDate: todayStr(),
   infoVenue: '동국대학교 대운동장',
-  awayTeam: 'FC 정통',
-  homeScore: '2',
+  awayTeam: '',
+  homeScore: '0',
   awayScore: '0',
   scorers: [
-    { minute: '8', name: '손승현' },
-    { minute: '13', name: '성준서', assist: '위인준' },
+    { minute: '0', name: '' },
+    { minute: '0', name: '', assist: '' },
   ],
-  pomName: '공기훈',
-  pomNumber: '7',
+  pomName: '',
+  pomNumber: '',
   pomPosition: 'MF',
 };
 
@@ -554,6 +555,12 @@ export default function Home() {
                         onChange={(e) => setResultOfficial((p) => { const sc = [...p.scorers]; sc[i] = { ...sc[i], name: e.target.value }; return { ...p, scorers: sc }; })} />
                       <input style={{ ...inputStyle, flex: 1 }} placeholder="도움 (선택)" value={s.assist ?? ''}
                         onChange={(e) => setResultOfficial((p) => { const sc = [...p.scorers]; sc[i] = { ...sc[i], assist: e.target.value }; return { ...p, scorers: sc }; })} />
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0, cursor: 'pointer' }}>
+                        <input type="checkbox" checked={s.isPenalty ?? false}
+                          onChange={(e) => setResultOfficial((p) => { const sc = [...p.scorers]; sc[i] = { ...sc[i], isPenalty: e.target.checked }; return { ...p, scorers: sc }; })}
+                          style={{ accentColor: '#CC0000', width: '14px', height: '14px' }} />
+                        <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '13px', letterSpacing: '2px', color: 'rgba(255,255,255,0.35)' }}>PK</span>
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -593,7 +600,7 @@ export default function Home() {
 
                 <div style={fieldStyle}>
                   <label style={labelStyle}>팀 단체사진</label>
-                  <input type="file" accept="image/*"
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif"
                     style={{ ...inputStyle, padding: '6px 12px', cursor: 'pointer' }}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
@@ -688,22 +695,53 @@ export default function Home() {
                     </button>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={labelStyle}>이름</label>
-                    <input style={inputStyle} value={pom.pomName}
-                      onChange={(e) => setPom((p) => ({ ...p, pomName: e.target.value }))} />
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>선수 선택</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {pom.pomName ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ ...inputStyle, display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+                          <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '18px', color: '#CC0000' }}>{pom.pomNumber}</span>
+                          <span style={{ fontFamily: "'Noto Sans KR', sans-serif", fontWeight: 700 }}>{pom.pomName}</span>
+                        </div>
+                        <button
+                          onClick={() => setPom((p) => ({ ...p, pomNumber: '', pomName: '' }))}
+                          style={{ flexShrink: 0, background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.3)', borderRadius: '2px', width: '30px', height: '36px', cursor: 'pointer', fontSize: '14px' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'rgba(204,0,0,0.5)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.3)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                        >✕</button>
+                      </div>
+                    ) : null}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {PLAYER_DB.map((p) => (
+                        <button
+                          key={p.num}
+                          onClick={() => setPom((prev) => ({ ...prev, pomNumber: p.num, pomName: p.name }))}
+                          style={{
+                            padding: '6px 10px',
+                            fontFamily: "'Noto Sans KR', sans-serif",
+                            fontSize: '13px',
+                            background: pom.pomNumber === p.num ? 'rgba(204,0,0,0.25)' : 'rgba(255,255,255,0.05)',
+                            color: pom.pomNumber === p.num ? '#FF3333' : 'rgba(255,255,255,0.7)',
+                            border: pom.pomNumber === p.num ? '1px solid rgba(204,0,0,0.6)' : '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '3px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                        >
+                          <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '14px', color: pom.pomNumber === p.num ? '#FF3333' : '#CC0000' }}>{p.num}</span>
+                          <span>{p.name}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <div style={{ width: '60px', flexShrink: 0 }}>
-                    <label style={labelStyle}>등번호</label>
-                    <input style={inputStyle} value={pom.pomNumber}
-                      onChange={(e) => setPom((p) => ({ ...p, pomNumber: e.target.value }))} />
-                  </div>
-                  <div style={{ width: '70px', flexShrink: 0 }}>
-                    <label style={labelStyle}>포지션</label>
-                    <input style={inputStyle} value={pom.pomPosition}
-                      onChange={(e) => setPom((p) => ({ ...p, pomPosition: e.target.value }))} />
-                  </div>
+                </div>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>포지션</label>
+                  <input style={inputStyle} value={pom.pomPosition}
+                    onChange={(e) => setPom((p) => ({ ...p, pomPosition: e.target.value }))} />
                 </div>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>경기 라벨 (선택)</label>
@@ -751,7 +789,7 @@ export default function Home() {
                 </div>
                 <div style={fieldStyle}>
                   <label style={labelStyle}>팀 단체사진</label>
-                  <input type="file" accept="image/*"
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif"
                     style={{ ...inputStyle, padding: '6px 12px', cursor: 'pointer' }}
                     onChange={(e) => {
                       const file = e.target.files?.[0];

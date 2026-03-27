@@ -219,13 +219,21 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                         color: 'rgba(204,0,0,0.9)', letterSpacing: '1px',
                       }}>{s.minute}&apos;</span>
                     </div>
-                    <div style={{ width: '160px', flexShrink: 0 }}>
+                    <div style={{ width: '160px', flexShrink: 0, display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                       <span style={{
                         fontFamily: "'Noto Sans KR', sans-serif",
                         fontSize: '20px', lineHeight: 1,
                         color: 'rgba(255,255,255,0.95)',
                         fontWeight: 700, letterSpacing: '1.5px',
                       }}>{s.name}</span>
+                      {s.isPenalty && (
+                        <span style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: '13px', lineHeight: 1,
+                          color: 'rgba(204,0,0,0.8)',
+                          letterSpacing: '1px',
+                        }}>Pen</span>
+                      )}
                     </div>
                     {s.assist && s.assist.trim() !== '' && (
                       <>
