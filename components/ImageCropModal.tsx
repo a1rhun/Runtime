@@ -58,18 +58,26 @@ export default function ImageCropModal({ src, aspectRatio, label, onConfirm, onC
     if (!img || !disp) return;
     const scaleX = img.naturalWidth / disp.w;
     const scaleY = img.naturalHeight / disp.h;
-    const cw = Math.round(cropDim.w * scaleX);
-    const ch = Math.round(cropDim.h * scaleY);
+    const srcX = Math.round(cropPos.x * scaleX);
+    const srcY = Math.round(cropPos.y * scaleY);
+    const srcW = Math.round(cropDim.w * scaleX);
+    const srcH = Math.round(cropDim.h * scaleY);
+
+    // iOS Safari는 캔버스 크기가 너무 크면 drawImage가 조용히 실패함
+    const MAX = 2048;
+    let dstW = srcW, dstH = srcH;
+    if (dstW > MAX || dstH > MAX) {
+      const ratio = Math.min(MAX / dstW, MAX / dstH);
+      dstW = Math.round(dstW * ratio);
+      dstH = Math.round(dstH * ratio);
+    }
+
     const canvas = document.createElement('canvas');
-    canvas.width = cw;
-    canvas.height = ch;
-    const ctx = canvas.getContext('2d')!;
-    ctx.drawImage(
-      img,
-      Math.round(cropPos.x * scaleX), Math.round(cropPos.y * scaleY),
-      cw, ch,
-      0, 0, cw, ch,
-    );
+    canvas.width = dstW;
+    canvas.height = dstH;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, dstW, dstH);
     onConfirm(canvas.toDataURL('image/jpeg', 0.92));
   };
 
