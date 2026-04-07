@@ -29,35 +29,16 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
 
       await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-      let dataUrl: string;
-      if (isMobile) {
-        // iOS Safari는 html-to-image의 SVG foreignObject 방식이 불안정함
-        // html2canvas는 직접 캔버스에 그려 모바일에서 더 안정적
-        const html2canvas = (await import('html2canvas')).default;
-        const canvas = await html2canvas(element, {
-          width: 1080,
-          height: 1080,
-          scale: 1,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#080808',
-          windowWidth: 1080,
-          windowHeight: 1080,
-        });
-        dataUrl = canvas.toDataURL('image/png');
-      } else {
-        const { toPng } = await import('html-to-image');
-        dataUrl = await toPng(element, {
-          width: 1080,
-          height: 1080,
-          pixelRatio: 1,
-        });
-      }
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(element, {
+        width: 1080,
+        height: 1080,
+        pixelRatio: 1,
+      });
 
       // 위치 복원
       element.style.cssText = prevCssText;
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       if (isMobile) {
         if (navigator.share) {
