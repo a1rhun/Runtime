@@ -310,6 +310,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                 fontSize: '42px',
                 letterSpacing: '5px',
                 color: 'rgba(255,255,255,0.85)',
+                whiteSpace: 'nowrap',
               }}
             >
               {data.awayTeam}
@@ -369,14 +370,13 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {data.scorers.map((s, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'flex-end' }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center' }}>
                     <div
                       style={{
                         width: '36px',
                         flexShrink: 0,
                         display: 'flex',
-                        alignItems: 'flex-end',
-                        paddingBottom: '3px',
+                        alignItems: 'center',
                       }}
                     >
                       <SoccerBall size={22} />
@@ -386,12 +386,13 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                         width: '68px',
                         flexShrink: 0,
                         display: 'flex',
-                        alignItems: 'flex-end',
+                        alignItems: 'center',
                       }}
                     >
                       <span
                         style={{
                           fontFamily: "'Bebas Neue', sans-serif",
+                          marginTop: '4px',
                           fontSize: '38px',
                           lineHeight: 1,
                           color: 'rgba(204,0,0,0.9)',
@@ -406,20 +407,21 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                         width: '180px',
                         flexShrink: 0,
                         display: 'flex',
-                        alignItems: 'flex-end',
+                        alignItems: 'center',
                         gap: '6px',
                       }}
                     >
                       <span
                         style={{
+                          marginTop: '-2px',
                           fontFamily: "'Noto Sans KR', sans-serif",
-                          fontSize: '32px',
+                          fontSize: '28px',
                           fontWeight: 700,
-                          lineHeight: 1,
+                          lineHeight: 1.2,
                           color: 'rgba(255,255,255,0.95)',
                           letterSpacing: '4px',
                           display: 'inline-block',
-                          transform: 'scaleX(0.78)',
+                          transform: 'scaleX(0.92)',
                           transformOrigin: 'left center',
                         }}
                       >
@@ -447,8 +449,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                             width: '30px',
                             flexShrink: 0,
                             display: 'flex',
-                            alignItems: 'flex-end',
-                            paddingBottom: '3px',
+                            alignItems: 'center',
                           }}
                         >
                           <SportShoe size={20} color="rgba(255,255,255,0.3)" strokeWidth={1.5} />

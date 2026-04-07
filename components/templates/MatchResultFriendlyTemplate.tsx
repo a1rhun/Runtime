@@ -97,6 +97,7 @@ export default function MatchResultFriendlyTemplate({ data }: Props) {
             <div style={{
               fontFamily: "'Bebas Neue', sans-serif",
               fontSize: '24px', letterSpacing: '5px', color: 'rgba(255,255,255,0.85)',
+              whiteSpace: 'nowrap',
             }}>{data.awayTeam}</div>
           </div>
         </div>
