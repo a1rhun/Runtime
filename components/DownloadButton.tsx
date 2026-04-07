@@ -15,14 +15,12 @@ async function applyMobileFixes(root: HTMLElement): Promise<() => void> {
   const restores: (() => void)[] = [];
 
   // Fix 1: CSS filter(invert)가 걸린 img → 픽셀 조작으로 흰색 변환
-  // ctx.filter는 iOS에서 SVG에 불안정 → SVG 내부 PNG를 추출해 직접 처리
   const imgs = root.querySelectorAll<HTMLImageElement>('img');
   for (const img of imgs) {
     const filterVal = img.style.filter;
     if (!filterVal || !filterVal.includes('invert')) continue;
 
     try {
-      // SVG URL이면 내장된 PNG를 꺼내 처리 (canvas taint 방지)
       let srcToDraw = img.src;
       if (!img.src.startsWith('data:')) {
         const resp = await fetch(img.src);
@@ -32,14 +30,16 @@ async function applyMobileFixes(root: HTMLElement): Promise<() => void> {
       }
 
       const tempImg = new Image();
-      tempImg.src = srcToDraw;
       await new Promise<void>((r) => {
         tempImg.onload = () => r();
         tempImg.onerror = () => r();
+        tempImg.src = srcToDraw;
+        // data URL은 동기적으로 로드될 수 있음
+        if (tempImg.complete && tempImg.naturalWidth) r();
       });
 
-      const w = tempImg.naturalWidth || img.naturalWidth || img.width;
-      const h = tempImg.naturalHeight || img.naturalHeight || img.height;
+      const w = tempImg.naturalWidth || img.naturalWidth || img.offsetWidth;
+      const h = tempImg.naturalHeight || img.naturalHeight || img.offsetHeight;
       if (!w || !h) continue;
 
       const canvas = document.createElement('canvas');
@@ -49,8 +49,6 @@ async function applyMobileFixes(root: HTMLElement): Promise<() => void> {
       if (!ctx) continue;
 
       ctx.drawImage(tempImg, 0, 0, w, h);
-
-      // brightness(0) invert(1): 불투명 픽셀을 모두 흰색으로
       const imageData = ctx.getImageData(0, 0, w, h);
       const data = imageData.data;
       for (let i = 0; i < data.length; i += 4) {
@@ -61,12 +59,25 @@ async function applyMobileFixes(root: HTMLElement): Promise<() => void> {
         }
       }
       ctx.putImageData(imageData, 0, 0);
-
       const whiteDataUrl = canvas.toDataURL('image/png');
+
       const prevSrc = img.src;
       const prevFilter = img.style.filter;
-      img.src = whiteDataUrl;
       img.style.filter = '';
+      img.src = whiteDataUrl;
+
+      // 새 이미지(data URL)가 완전히 로드될 때까지 대기
+      await new Promise<void>((r) => {
+        if (img.complete && img.naturalWidth) { r(); return; }
+        const done = () => {
+          img.removeEventListener('load', done);
+          img.removeEventListener('error', done);
+          r();
+        };
+        img.addEventListener('load', done);
+        img.addEventListener('error', done);
+      });
+
       restores.push(() => {
         img.src = prevSrc;
         img.style.filter = prevFilter;
@@ -77,23 +88,23 @@ async function applyMobileFixes(root: HTMLElement): Promise<() => void> {
   }
 
   // Fix 2: gradient clip text → webkit 속성 제거 (흰색 inherited color로 표시)
-  // React는 style.setProperty('-webkit-text-fill-color', ...)로 설정하므로
-  // cssText로 감지해야 함 (el.style.WebkitTextFillColor 접근은 불안정)
+  // getPropertyValue()로 감지 (cssText.includes보다 신뢰성 높음)
   const allEls = root.querySelectorAll<HTMLElement>('*');
   for (const el of allEls) {
-    if (!el.style.cssText.includes('-webkit-text-fill-color')) continue;
+    const textFillColor = el.style.getPropertyValue('-webkit-text-fill-color');
+    if (!textFillColor) continue;
 
     const prevCssText = el.style.cssText;
     el.style.removeProperty('-webkit-text-fill-color');
     el.style.removeProperty('-webkit-background-clip');
-    el.style.removeProperty('background');
+    el.style.background = 'none';
     restores.push(() => {
       el.style.cssText = prevCssText;
     });
   }
 
   // DOM 반영 대기
-  await new Promise<void>((r) => requestAnimationFrame(() => r()));
+  await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
   return () => restores.forEach((fn) => fn());
 }
