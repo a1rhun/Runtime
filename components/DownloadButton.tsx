@@ -7,6 +7,72 @@ interface Props {
   filename?: string;
 }
 
+/**
+ * iOS Safari는 SVG foreignObject 내부에서 CSS filter / WebkitBackgroundClip: text를
+ * 렌더링하지 않음. 캡처 전 해당 속성을 직접 처리하고 캡처 후 복원한다.
+ */
+async function applyMobileFixes(root: HTMLElement): Promise<() => void> {
+  const restores: (() => void)[] = [];
+
+  // Fix 1: CSS filter가 걸린 img → canvas로 필터 적용 후 data URL로 교체
+  const filteredImgs = root.querySelectorAll<HTMLImageElement>('img');
+  for (const img of filteredImgs) {
+    const filterVal = img.style.filter;
+    if (!filterVal) continue;
+
+    // 이미지 로드 보장
+    if (!img.complete) {
+      await new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+    }
+
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (!w || !h) continue;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) continue;
+
+    ctx.filter = filterVal;
+    ctx.drawImage(img, 0, 0, w, h);
+    const dataUrl = canvas.toDataURL();
+
+    const prevSrc = img.src;
+    const prevFilter = img.style.filter;
+    img.src = dataUrl;
+    img.style.filter = '';
+    restores.push(() => {
+      img.src = prevSrc;
+      img.style.filter = prevFilter;
+    });
+  }
+
+  // Fix 2: WebkitTextFillColor: transparent (그라디언트 클립 텍스트) → 단색 처리
+  const allEls = root.querySelectorAll<HTMLElement>('*');
+  for (const el of allEls) {
+    if (el.style.WebkitTextFillColor === 'transparent') {
+      const prevFill = el.style.WebkitTextFillColor;
+      const prevClip = el.style.WebkitBackgroundClip;
+      el.style.WebkitTextFillColor = '#CC0000';
+      el.style.WebkitBackgroundClip = 'unset';
+      restores.push(() => {
+        el.style.WebkitTextFillColor = prevFill;
+        el.style.WebkitBackgroundClip = prevClip;
+      });
+    }
+  }
+
+  // DOM 반영 대기
+  await new Promise<void>((r) => requestAnimationFrame(() => r()));
+
+  return () => restores.forEach((fn) => fn());
+}
+
 export default function DownloadButton({ targetId, filename = 'runtime-card' }: Props) {
   const [loading, setLoading] = useState(false);
 
@@ -19,6 +85,8 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
       'position:fixed;inset:0;background:#0a0a0a;z-index:9999;pointer-events:none;';
     document.body.appendChild(overlay);
 
+    let restore: (() => void) | undefined;
+
     try {
       const element = document.getElementById(targetId);
       if (!element) return;
@@ -29,6 +97,12 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
 
       await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        restore = await applyMobileFixes(element);
+      }
+
       const { toPng } = await import('html-to-image');
       const dataUrl = await toPng(element, {
         width: 1080,
@@ -36,9 +110,11 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
         pixelRatio: 1,
       });
 
+      restore?.();
+      restore = undefined;
+
       // 위치 복원
       element.style.cssText = prevCssText;
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       if (isMobile) {
         if (navigator.share) {
@@ -63,6 +139,7 @@ export default function DownloadButton({ targetId, filename = 'runtime-card' }: 
         link.click();
       }
     } finally {
+      restore?.();
       overlay.remove();
       setLoading(false);
     }
