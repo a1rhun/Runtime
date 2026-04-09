@@ -86,6 +86,7 @@ const styles = {
     letterSpacing: "8px",
     color: "rgba(255,255,255,0.85)",
     lineHeight: 1,
+    whiteSpace: "nowrap",
   },
   opponentEmblem: {
     width: "210px",

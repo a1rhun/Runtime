@@ -7,80 +7,81 @@ interface Props {
   filename?: string;
 }
 
+function showMobileScreenshotMode(element: HTMLElement): () => void {
+  const prevCssText = element.style.cssText;
+  const scale = window.innerWidth / 1080;
+  const cardDisplayHeight = Math.round(1080 * scale);
+
+  // 전체 화면 덮개
+  const backdrop = document.createElement('div');
+  backdrop.style.cssText =
+    'position:fixed;inset:0;background:#0a0a0a;z-index:9996;';
+  document.body.appendChild(backdrop);
+
+  // 카드를 화면 상단에 꽉 차게 배치
+  element.style.cssText = `position:fixed;top:0;left:0;width:1080px;height:1080px;transform:scale(${scale});transform-origin:top left;z-index:9997;overflow:hidden;pointer-events:none;`;
+
+  // 하단 안내 바
+  const bar = document.createElement('div');
+  bar.style.cssText = `position:fixed;top:${cardDisplayHeight}px;left:0;right:0;bottom:0;background:#0a0a0a;z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;`;
+  bar.innerHTML = `
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:4px;color:rgba(255,255,255,0.45);">스크린샷을 찍어주세요</div>
+    <button id="sc-close-btn" style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:3px;padding:10px 32px;background:#CC0000;color:#fff;border:none;cursor:pointer;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);">CLOSE</button>
+  `;
+  document.body.appendChild(bar);
+
+  const cleanup = () => {
+    element.style.cssText = prevCssText;
+    backdrop.remove();
+    bar.remove();
+  };
+
+  document.getElementById('sc-close-btn')?.addEventListener('click', cleanup);
+  return cleanup;
+}
+
 export default function DownloadButton({ targetId, filename = 'runtime-card' }: Props) {
   const [loading, setLoading] = useState(false);
 
   const handleDownload = async () => {
+    const element = document.getElementById(targetId);
+    if (!element) return;
+
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      showMobileScreenshotMode(element);
+      return;
+    }
+
+    // 데스크톱: PNG 생성 후 다운로드
     setLoading(true);
 
-    // 캡처 중 카드가 화면에 잠깐 보이는 것을 막는 오버레이
     const overlay = document.createElement('div');
     overlay.style.cssText =
       'position:fixed;inset:0;background:#0a0a0a;z-index:9999;pointer-events:none;';
     document.body.appendChild(overlay);
 
     try {
-      const element = document.getElementById(targetId);
-      if (!element) return;
-
       const prevCssText = element.style.cssText;
       element.style.cssText =
         'position:fixed;left:0;top:0;width:1080px;height:1080px;overflow:hidden;pointer-events:none;z-index:9998;';
 
       await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
 
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(element, {
+        width: 1080,
+        height: 1080,
+        pixelRatio: 1,
+      });
 
-      let dataUrl: string;
-      if (isMobile) {
-        // iOS Safari는 html-to-image의 SVG foreignObject 방식이 불안정함
-        // html2canvas는 직접 캔버스에 그려 모바일에서 더 안정적
-        const html2canvas = (await import('html2canvas')).default;
-        const canvas = await html2canvas(element, {
-          width: 1080,
-          height: 1080,
-          scale: 1,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#080808',
-          windowWidth: 1080,
-          windowHeight: 1080,
-        });
-        dataUrl = canvas.toDataURL('image/png');
-      } else {
-        const { toPng } = await import('html-to-image');
-        dataUrl = await toPng(element, {
-          width: 1080,
-          height: 1080,
-          pixelRatio: 1,
-        });
-      }
-
-      // 위치 복원
       element.style.cssText = prevCssText;
 
-      if (isMobile) {
-        if (navigator.share) {
-          const res = await fetch(dataUrl);
-          const blob = await res.blob();
-          const file = new File([blob], `${filename}.png`, { type: 'image/png' });
-          try {
-            await navigator.share({ files: [file] });
-            return;
-          } catch {
-            // 공유 취소 or 미지원 → 다운로드 fallback
-          }
-        }
-        const link = document.createElement('a');
-        link.download = `${filename}.png`;
-        link.href = dataUrl;
-        link.click();
-      } else {
-        const link = document.createElement('a');
-        link.download = `${filename}.png`;
-        link.href = dataUrl;
-        link.click();
-      }
+      const link = document.createElement('a');
+      link.download = `${filename}.png`;
+      link.href = dataUrl;
+      link.click();
     } finally {
       overlay.remove();
       setLoading(false);
