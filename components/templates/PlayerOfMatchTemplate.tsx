@@ -185,7 +185,7 @@ export default function PlayerOfMatchTemplate({ data }: Props) {
                 fontWeight: 900,
                 color: '#ffffff',
                 lineHeight: 1,
-                letterSpacing: '0px',
+                letterSpacing: '6px',
                 textShadow: '0 2px 24px rgba(0,0,0,0.8)',
               }}
             >

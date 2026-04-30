@@ -175,10 +175,10 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
           />
           <span
             style={{
-              fontFamily: "'Archivo Black', sans-serif",
+              fontFamily: "'Pretendard', sans-serif",
               fontSize: '42px',
-              letterSpacing: '10px',
-              fontWeight: 700,
+              letterSpacing: '4px',
+              fontWeight: 900,
               lineHeight: 1.2,
               background: 'linear-gradient(90deg, #CC0000, rgba(255,220,200,0.9), #CC0000)',
               WebkitBackgroundClip: 'text',
@@ -418,7 +418,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                           fontWeight: 900,
                           lineHeight: 1,
                           color: 'rgba(255,255,255,0.95)',
-                          letterSpacing: '0px',
+                          letterSpacing: '3px',
                         }}
                       >
                         {s.name}
@@ -457,7 +457,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                             fontSize: '26px',
                             lineHeight: 1,
                             color: 'rgba(255,255,255,0.45)',
-                            letterSpacing: '0px',
+                            letterSpacing: '2px',
                           }}
                         >
                           {s.assist}
@@ -525,7 +525,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                     fontSize: '30px',
                     fontWeight: 900,
                     color: 'rgba(255,255,255,0.92)',
-                    letterSpacing: '0px',
+                    letterSpacing: '3px',
                   }}
                 >
                   {data.pomName}
