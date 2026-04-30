@@ -86,7 +86,7 @@ const PhotoPlaceholder = ({ label }: { label: string }) => (
   >
     <span
       style={{
-        fontFamily: "'Archivo Black', sans-serif",
+        fontFamily: "'Bebas Neue', sans-serif",
         fontSize: '60px',
         letterSpacing: '4px',
         color: 'rgba(255,255,255,0.2)',
@@ -136,7 +136,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
           />
           <span
             style={{
-              fontFamily: "'Archivo Black', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
               fontSize: '36px',
               letterSpacing: '10px',
               color: '#FFFFFF',
@@ -175,7 +175,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
           />
           <span
             style={{
-              fontFamily: "'Archivo Black', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
               fontSize: '42px',
               letterSpacing: '10px',
               fontWeight: 700,
@@ -189,7 +189,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
           </span>
           <span
             style={{
-              fontFamily: "'Archivo Black', sans-serif",
+              fontFamily: "'Bebas Neue', sans-serif",
               fontSize: '32px',
               letterSpacing: '5px',
               color: 'rgba(255,255,255,0.55)',
@@ -238,7 +238,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
             />
             <div
               style={{
-                fontFamily: "'Archivo Black', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
                 fontSize: '42px',
                 letterSpacing: '5px',
                 color: 'rgba(255,255,255,0.85)',
@@ -259,7 +259,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
           >
             <div
               style={{
-                fontFamily: "'Archivo Black', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
                 fontSize: '200px',
                 color: '#CC0000',
                 lineHeight: 1,
@@ -306,7 +306,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
             </div>
             <div
               style={{
-                fontFamily: "'Archivo Black', sans-serif",
+                fontFamily: "'Bebas Neue', sans-serif",
                 fontSize: '42px',
                 letterSpacing: '5px',
                 color: 'rgba(255,255,255,0.85)',
@@ -359,7 +359,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                 />
                 <span
                   style={{
-                    fontFamily: "'Archivo Black', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                     fontSize: '34px',
                     letterSpacing: '6px',
                     color: 'rgba(255,255,255,0.45)',
@@ -391,7 +391,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                     >
                       <span
                         style={{
-                          fontFamily: "'Archivo Black', sans-serif",
+                          fontFamily: "'Bebas Neue', sans-serif",
                           marginTop: '4px',
                           fontSize: '38px',
                           lineHeight: 1,
@@ -413,12 +413,16 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                     >
                       <span
                         style={{
-                          fontFamily: "'Pretendard', sans-serif",
-                          fontSize: '32px',
-                          fontWeight: 900,
-                          lineHeight: 1,
+                          marginTop: '-2px',
+                          fontFamily: "'Noto Sans KR', sans-serif",
+                          fontSize: '28px',
+                          fontWeight: 700,
+                          lineHeight: 1.2,
                           color: 'rgba(255,255,255,0.95)',
-                          letterSpacing: '0px',
+                          letterSpacing: '4px',
+                          display: 'inline-block',
+                          transform: 'scaleX(0.92)',
+                          transformOrigin: 'left center',
                         }}
                       >
                         {s.name}
@@ -426,7 +430,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                       {s.isPenalty && (
                         <span
                           style={{
-                            fontFamily: "'Archivo Black', sans-serif",
+                            fontFamily: "'Bebas Neue', sans-serif",
                             fontSize: '28px',
                             lineHeight: 1,
                             color: 'rgba(204,0,0,0.8)',
@@ -452,12 +456,15 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                         </div>
                         <span
                           style={{
-                            fontFamily: "'Pretendard', sans-serif",
+                            fontFamily: "'Noto Sans KR', sans-serif",
                             fontWeight: 700,
                             fontSize: '26px',
                             lineHeight: 1,
                             color: 'rgba(255,255,255,0.45)',
-                            letterSpacing: '0px',
+                            display: 'inline-block',
+                            transform: 'scaleX(0.78)',
+                            letterSpacing: '2px',
+                            transformOrigin: 'left center',
                           }}
                         >
                           {s.assist}
@@ -495,7 +502,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                 />
                 <span
                   style={{
-                    fontFamily: "'Archivo Black', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                     fontSize: '34px',
                     letterSpacing: '6px',
                     color: 'rgba(255,255,255,0.45)',
@@ -509,7 +516,7 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span
                   style={{
-                    fontFamily: "'Archivo Black', sans-serif",
+                    fontFamily: "'Bebas Neue', sans-serif",
                     fontSize: '58px',
                     lineHeight: 1,
                     color: '#CC0000',
@@ -521,11 +528,11 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
                 </span>
                 <span
                   style={{
-                    fontFamily: "'Pretendard', sans-serif",
+                    fontFamily: "'Noto Sans KR', sans-serif",
                     fontSize: '30px',
-                    fontWeight: 900,
+                    fontWeight: 700,
                     color: 'rgba(255,255,255,0.92)',
-                    letterSpacing: '0px',
+                    letterSpacing: '2px',
                   }}
                 >
                   {data.pomName}
