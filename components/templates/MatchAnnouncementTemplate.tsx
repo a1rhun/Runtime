@@ -81,7 +81,8 @@ const styles = {
     gap: "20px",
   },
   teamLabel: {
-    fontFamily: "'Bebas Neue', sans-serif",
+    fontFamily: "'Bebas Neue', 'Pretendard', sans-serif",
+    fontWeight: 900,
     fontSize: "48px",
     letterSpacing: "8px",
     color: "rgba(255,255,255,0.85)",

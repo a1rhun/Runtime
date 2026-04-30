@@ -165,9 +165,9 @@ export default function MatchResultFriendlyTemplate({ data }: Props) {
             <div
               style={{
                 fontFamily: "'Pretendard', sans-serif",
-                fontWeight: 800,
+                fontWeight: 900,
                 fontSize: '24px',
-                letterSpacing: '0px',
+                letterSpacing: '2px',
                 color: 'rgba(255,255,255,0.85)',
                 whiteSpace: 'nowrap',
               }}

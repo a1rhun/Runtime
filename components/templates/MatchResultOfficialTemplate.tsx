@@ -306,7 +306,8 @@ export default function MatchResultOfficialTemplate({ data }: Props) {
             </div>
             <div
               style={{
-                fontFamily: "'Archivo Black', sans-serif",
+                fontFamily: "'Archivo Black', 'Pretendard', sans-serif",
+                fontWeight: 900,
                 fontSize: '42px',
                 letterSpacing: '5px',
                 color: 'rgba(255,255,255,0.85)',
